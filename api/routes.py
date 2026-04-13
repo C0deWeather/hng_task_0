@@ -11,7 +11,7 @@ async def get_health():
 @router.get("/api/classify", response_model=SuccessResponse)
 async def classify(name: str):
     try:
-        result = classify_name(name)
+        result = await classify_name(name)
         return SuccessResponse(status="success", data=result)
     except Exception as e:
         raise HTTPException(
