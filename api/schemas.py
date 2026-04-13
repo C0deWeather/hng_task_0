@@ -4,10 +4,10 @@ from datetime import datetime
 
 
 class ExternalAPIResponse(BaseModel):
-    count: int
-    name: str
-    gender: str
-    probability: float
+    count: int | None
+    name: str | None
+    gender: str | None
+    probability: float | None
 
 
 class ClassificationResult(BaseModel):
