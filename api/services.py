@@ -1,5 +1,5 @@
 import httpx
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import HTTPException
 from api.schemas import ClassificationResult, ExternalAPIResponse
 
@@ -19,7 +19,17 @@ async def fetch_data_from_api(name: str):
     except httpx.ConnectError:
         raise HTTPException(
             status_code=502,
-            detail="Connection failed"
+            detail="External API connection failed"
+        )
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"External API error: {exc.response.status_code}"
+        )
+    except httpx.RequestError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"External API request error: {str(exc)}"
         )
 
 async def classify_name(name: str) -> ClassificationResult:
@@ -39,4 +49,5 @@ async def classify_name(name: str) -> ClassificationResult:
         probability=api_response.probability,
         sample_size=api_response.count,
         is_confident=is_confident,
-        processed_at=datetime.now(datetime.timezone.utc))
+        processed_at=datetime.now(timezone.utc)
+    )
