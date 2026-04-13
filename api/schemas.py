@@ -10,7 +10,7 @@ class ExternalAPIResponse(BaseModel):
     probability: float
 
 
-class PredictionResult(BaseModel):
+class ClassificationResult(BaseModel):
     name: str
     gender: str
     probability: float
@@ -21,7 +21,7 @@ class PredictionResult(BaseModel):
 
 class SuccessResponse(BaseModel):
     status: Literal["success"]
-    data: PredictionResult
+    data: ClassificationResult
 
 
 class ErrorResponse(BaseModel):
