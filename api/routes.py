@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query, status
 from api.services import classify_name
-from api.schemas import SuccessResponse
+from api.schemas import ErrorResponse, SuccessResponse
 
 router = APIRouter()
 
@@ -8,7 +8,16 @@ router = APIRouter()
 async def get_health():
     return {"status": "ok"}
 
-@router.get("/api/classify", response_model=SuccessResponse)
+@router.get(
+    "/api/classify",
+    response_model=SuccessResponse,
+    responses={
+        404: {"model": ErrorResponse, "description": "Name not found"},
+        422: {"model": ErrorResponse, "description": "Validation error"},
+        500: {"model": ErrorResponse, "description": "Internal server error"},
+        502: {"model": ErrorResponse, "description": "External API error"},
+    },
+)
 async def classify(name: str = Query(..., min_length=1)):
     normalized_name = name.strip()
     if not normalized_name:
