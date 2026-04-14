@@ -13,10 +13,17 @@ origins = settings.cors_origins
 app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
-        allow_credentials=True,
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def enforce_cors_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @app.exception_handler(HTTPException)

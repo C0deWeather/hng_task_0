@@ -2,9 +2,10 @@ import httpx
 from datetime import datetime, timezone
 from fastapi import HTTPException
 from api.schemas import ClassificationResult, ExternalAPIResponse
+from api.config import settings
 
 async def fetch_data_from_api(name: str):
-    url = f"https://api.genderize.io?name={name}"
+    url = f"{settings.genderise_api}?name={name}"
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get(url)
@@ -34,7 +35,17 @@ async def fetch_data_from_api(name: str):
 
 async def classify_name(name: str) -> ClassificationResult:
     api_response = await fetch_data_from_api(name)
-    if api_response.count == 0 or api_response.gender is None:
+    if (
+        api_response.count is None
+        or api_response.gender is None
+        or api_response.probability is None
+        or api_response.name is None
+    ):
+        raise HTTPException(
+            status_code=502,
+            detail="Invalid response from external API"
+        )
+    if api_response.count == 0:
         raise HTTPException(
             status_code=404,
             detail="Name not found"
