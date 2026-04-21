@@ -18,14 +18,6 @@ app.add_middleware(
         allow_headers=["*"],
 )
 
-
-@app.middleware("http")
-async def enforce_cors_header(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
-
-
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(
